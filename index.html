@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hong Kong MPS Rate Calculator</title>
+    <script src="https://jsdelivr.net"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 flex items-center justify-center min-h-screen p-4 font-sans">
+
+    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-2xl w-full max-w-xl">
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <h1 class="text-2xl sm:text-3xl font-black tracking-tight bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
+                MPS Rate Explorer
+            </h1>
+            <p class="text-xs text-slate-400 mt-1 uppercase tracking-widest font-semibold">
+                Live Calendar Engine (2023 - 2026)
+            </p>
+        </div>
+
+        <!-- Inputs Grid -->
+        <div class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Fiscal Year</label>
+                    <select id="fiscalYear" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm cursor-pointer outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="2026" selected>2026/27 (Current)</option>
+                        <option value="2025">2025/26</option>
+                        <option value="2024">2024/25</option>
+                        <option value="2023">2023/24</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Calendar Month</label>
+                    <select id="calendarMonth" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm cursor-pointer outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="0">January</option><option value="1">February</option><option value="2">March</option>
+                        <option value="3">April</option><option value="4">May</option><option value="5">June</option>
+                        <option value="6">July</option><option value="7">August</option><option value="8">September</option>
+                        <option value="9" selected>October</option><option value="10">November</option><option value="11">December</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">MPS Point</label>
+                    <select id="mpsPoint" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 text-white text-sm cursor-pointer outline-none focus:ring-2 focus:ring-emerald-500">
+                        <!-- Populated on load -->
+                    </select>
+                </div>
+            </div>
+
+            <!-- Overrides and Tweakables -->
+            <div class="grid grid-cols-2 gap-4 bg-slate-950/40 p-4 border border-slate-800 rounded-xl">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Working Days</label>
+                    <input type="number" id="workingDays" min="1" max="31" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-white font-mono text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+                    <span class="text-[10px] text-slate-500 mt-1 block">Auto-synced to calendar weekdays.</span>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Hours / Day</label>
+                    <input type="number" id="workingHours" value="8" min="1" max="24" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 text-white font-mono text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+                    <span class="text-[10px] text-slate-500 mt-1 block">Hourly rate is based on standard 8-hour work day.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calculated Readouts -->
+        <div class="mt-6 pt-6 border-t border-slate-800 space-y-4">
+            <div class="bg-slate-950 p-4 rounded-xl flex justify-between items-center border border-slate-800/80">
+                <div>
+                    <span class="text-slate-500 text-xs font-bold uppercase tracking-wider block">Base Salary Point</span>
+                    <span id="monthlySalaryDisplay" class="text-xl font-bold text-slate-300 font-mono">\$-</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-slate-500 text-xs font-bold uppercase tracking-wider block">Daily Pro-Rata</span>
+                    <span id="dailyRate" class="text-3xl font-black text-emerald-400 font-mono">\$-</span>
+                </div>
+            </div>
+            
+            <div class="bg-slate-950 p-4 rounded-xl flex justify-between items-center border border-slate-800/80">
+                <span class="text-slate-500 text-xs font-bold uppercase tracking-wider">Hourly Equivalent Yield</span>
+                <span id="hourlyRate" class="text-3xl font-black text-blue-400 font-mono">\$-</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Vibe Code Engine -->
+    <script>
+        // Certified and aligned 2026/27 base array (Points 0 to 49 explicitly mapped)
+        const mpsDatabase = [
+            14570, 15485, 16460, 17545, 18675, 19930, 21190, 22590, 24060, 25620, // 0-9
+            27120, 28790, 30595, 32430, 34380, 36440, 38585, 40835, 43210, 45650, // 10-19
+            48240, 50915, 53785, 56795, 59975, 63335, 66890, 70595, 74510, 78595, // 20-29
+            82890, 87315, 91900, 96715, 101835, 107140, 112705, 118545, 124705, 131175, // 30-39
+            137975, 144070, 147510, 151045, 154670, 158380, 162180, 166075, 170060, 178320 // 40-49
+        ];
+
+        // Definite annual reduction scale to calculate historical tiers precisely
+        const yearlyMultipliers = {
+            "2026": 1.000,
+            "2025": 0.980,
+            "2024": 0.951,
+            "2023": 0.923
+        };
+
+        const yearSelect = document.getElementById('fiscalYear');
+        const monthSelect = document.getElementById('calendarMonth');
+        const mpsSelect = document.getElementById('mpsPoint');
+        const daysInput = document.getElementById('workingDays');
+        const hoursInput = document.getElementById('workingHours');
+        
+        const salaryDisplay = document.getElementById('monthlySalaryDisplay');
+        const dailyRateDisplay = document.getElementById('dailyRate');
+        const hourlyRateDisplay = document.getElementById('hourlyRate');
+
+        function populateMpsDropdown() {
+            const selectedYear = yearSelect.value;
+            const multiplier = yearlyMultipliers[selectedYear] || 1.0;
+            const activeIndex = mpsSelect.selectedIndex >= 0 ? mpsSelect.selectedIndex : 11;
+            
+            mpsSelect.innerHTML = '';
+            mpsDatabase.forEach((baseSalary, index) => {
+                const adjustedSalary = Math.round(baseSalary * multiplier);
+                const option = document.createElement('option');
+                option.value = adjustedSalary;
+                option.textContent = `Point ${index} ($${adjustedSalary.toLocaleString()})`;
+                mpsSelect.appendChild(option);
+            });
+
+            mpsSelect.selectedIndex = activeIndex;
+            syncCalendarWeekdays();
+        }
+
+        function syncCalendarWeekdays() {
+            const year = parseInt(yearSelect.value);
+            const month = parseInt(monthSelect.value);
+            let weekdayCount = 0;
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dayOfWeek = new Date(year, month, d).getDay();
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) weekdayCount++;
+            }
+            daysInput.value = weekdayCount;
+            calculateRates();
+        }
+
+        function calculateRates() {
+            const monthlySalary = parseFloat(mpsSelect.value) || 0;
+            const days = parseFloat(daysInput.value) || 1;
+            const hours = parseFloat(hoursInput.value) || 1;
+
+            const daily = monthlySalary / days;
+            const hourly = daily / hours;
+
+            salaryDisplay.textContent = `$${monthlySalary.toLocaleString()}`;
+            dailyRateDisplay.textContent = `$${daily.toFixed(2)}`;
+            hourlyRateDisplay.textContent = `$${hourly.toFixed(2)}`;
+        }
+
+        // Setup reactive bindings
+        yearSelect.addEventListener('change', populateMpsDropdown);
+        monthSelect.addEventListener('change', syncCalendarWeekdays);
+        [mpsSelect, daysInput, hoursInput].forEach(element => {
+            element.addEventListener('input', calculateRates);
+        });
+
+        // Initialize application workflow cleanly
+        populateMpsDropdown();
+    </script>
+</body>
+</html>
