@@ -103,11 +103,13 @@
     <div class="form-group">
         <label for="workingDays">Working Days:</label>
         <input type="number" id="workingDays" min="1" max="31">
+        <small style="font-style: italic; color: #555;">(Auto-synced to calendar weekdays)</small>
     </div>
 
     <div class="form-group">
         <label for="workingHours">Hours / Day:</label>
         <input type="number" id="workingHours" value="8" min="1" max="24">
+        <small style="font-style: italic; color: #555;">(Standard 8-hour workday benchmark)</small>
     </div>
 
     <hr>
@@ -140,6 +142,7 @@
         It does not gather personal telemetry, load third-party scripts, or track analytical traffic. 
         Licensed openly under the Creative Commons Attribution 4.0 framework.
     </p>
+
     <script>
         // Audited and aligned with official HKSAR Civil Service Bureau Gazettes
         const mpsDatabase = {
