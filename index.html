@@ -1,244 +1,228 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hong Kong MPS Rate Calculator</title>
-    <style>
-        body {
-            background-color: #ffffff;
-            color: #000000;
-            font-family: "Times New Roman", Times, serif;
-            padding: 20px;
-            max-width: 650px;
-            margin: 0 auto;
-        }
-        h1 {
-            font-size: 28px;
-            font-weight: bold;
-            margin-bottom: 5px;
-            letter-spacing: 0.5px;
-        }
-        p {
-            margin: 5px 0 20px 0;
-            font-size: 14px;
-        }
-        hr {
-            border: 0;
-            border-top: 1px solid #000000;
-            margin: 20px 0;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: inline-block;
-            width: 130px;
-            font-weight: bold;
-        }
-        select, input {
-            font-family: "Times New Roman", Times, serif;
-            font-size: 14px;
-            padding: 2px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #000000;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #1b4332;
-            color: #ffffff;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
-        .text-right {
-            text-align: right;
-        }
-        .footer-note {
-            font-size: 11px;
-            color: #333333;
-            margin-top: 25px;
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Hong Kong Master Pay Scale archive and illustrative daily and hourly equivalents, with official sources.">
+  <title>Aescher &amp; Co. | Hong Kong MPS Calculator</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { max-width: 690px; margin: 0 auto; padding: 24px 20px; background: white; color: #111; font: 16px/1.45 "Times New Roman", Times, serif; }
+    h1 { font-size: 28px; margin: 0 0 4px; letter-spacing: .5px; }
+    h2 { font-size: 20px; margin: 0 0 10px; }
+    p { margin: 8px 0 16px; }
+    hr { border: 0; border-top: 1px solid #111; margin: 22px 0; }
+    .row { display: grid; grid-template-columns: 150px minmax(0, 1fr); align-items: start; gap: 8px; margin-bottom: 14px; }
+    label { font-weight: bold; padding-top: 8px; }
+    select, input, button { font: inherit; min-height: 42px; padding: 7px; border: 1px solid #777; border-radius: 0; background: white; color: #111; }
+    select { width: 100%; }
+    input { width: 110px; max-width: 100%; }
+    input:read-only { background: #f3f3f3; }
+    :focus-visible { outline: 2px solid #1b4332; outline-offset: 3px; }
+    small, .note { display: block; font-size: 14px; color: #444; }
+    small { margin-top: 5px; }
+    a { color: #153c2c; }
+    [aria-invalid="true"] { border: 2px solid #a00000; }
+    .error { color: #900; }
+    [hidden] { display: none !important; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    caption { text-align: left; font-weight: bold; margin-bottom: 8px; }
+    th, td { border: 1px solid #111; padding: 10px; text-align: left; }
+    thead th { background: #1b4332; color: white; }
+    tbody th { font-weight: normal; }
+    .amount { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    summary { cursor: pointer; padding: 8px 0; font-weight: bold; }
+    li { margin: 6px 0; }
+    footer { font-size: 13px; color: #444; }
+    @media (max-width: 440px) { body { padding: 18px 14px; } .row { grid-template-columns: 1fr; gap: 3px; } label { padding-top: 0; } th, td { padding: 8px; } }
+  </style>
 </head>
 <body>
-
-    <h1>Aescher & Co.</h1>
-    <h3>Hong Kong MPS Rate Calculator & Archive</h3>
-    <p>A no-frills, high-fidelity accounting utility for public service scales.</p>
-    
-    <hr>
-
-    <div class="form-group">
-        <label for="fiscalYear">Fiscal Year:</label>
-        <select id="fiscalYear">
-            <option value="2026" selected>2026/27 (Current)</option>
-            <option value="2025">2025/26 (Salary Freeze)</option>
-            <option value="2024">2024/25</option>
-            <option value="2023">2023/24</option>
-        </select>
-    </div>
-
-    <div class="form-group">
-        <label for="calendarMonth">Calendar Month:</label>
-        <select id="calendarMonth">
-            <option value="0">January</option><option value="1">February</option><option value="2">March</option>
-            <option value="3">April</option><option value="4">May</option><option value="5">June</option>
-            <option value="6">July</option><option value="7">August</option><option value="8">September</option>
-            <option value="9" selected>October</option><option value="10">November</option><option value="11">December</option>
-        </select>
-    </div>
-
-    <div class="form-group">
-        <label for="mpsPoint">MPS Scale Point:</label>
-        <select id="mpsPoint"></select>
-    </div>
-
-    <div class="form-group">
-        <label for="workingDays">Working Days:</label>
-        <input type="number" id="workingDays" min="1" max="31">
-        <small style="font-style: italic; color: #555;">(Auto-synced to calendar weekdays)</small>
-    </div>
-
-    <div class="form-group">
-        <label for="workingHours">Hours / Day:</label>
-        <input type="number" id="workingHours" value="8" min="1" max="24">
-        <small style="font-style: italic; color: #555;">(Standard 8-hour workday benchmark)</small>
-    </div>
-
-    <hr>
-
+<main>
+  <h1>Aescher &amp; Co.</h1>
+  <h2>Hong Kong MPS Calculator &amp; Archive</h2>
+  <p>Official monthly pay scales. Simple daily and hourly comparisons.</p>
+  <noscript><p class="error">Enable JavaScript to use the calculator. Official source links remain available below.</p></noscript>
+  <hr>
+  <p id="archiveWarning" class="note" role="status" hidden></p>
+  <div class="row">
+    <label for="fiscalYear">Financial year</label>
+    <div><select id="fiscalYear" aria-describedby="yearHelp"></select><small id="yearHelp">1 April to 31 March. Rates are shown retrospectively from their effective dates.</small></div>
+  </div>
+  <div class="row">
+    <label for="calendarMonth">Month</label>
+    <select id="calendarMonth"></select>
+  </div>
+  <div class="row">
+    <label for="mpsPoint">MPS point</label>
+    <select id="mpsPoint"></select>
+  </div>
+  <div class="row">
+    <label for="dayMode">Day-count basis</label>
+    <div><select id="dayMode" aria-describedby="daysHelp"><option value="weekdays">Calendar weekdays (Mon–Fri)</option><option value="custom">Custom working days</option></select><small id="daysHelp">Weekdays include public holidays. Choose custom days to account for holidays, leave or a different work schedule.</small></div>
+  </div>
+  <div class="row">
+    <label for="workingDays">Working days</label>
+    <div><input id="workingDays" type="number" min="1" max="31" step="1" required readonly aria-describedby="dayStatus validationError"><small id="dayStatus"></small></div>
+  </div>
+  <div class="row">
+    <label for="workingHours">Hours per day</label>
+    <div><input id="workingHours" type="number" min="0.01" max="24" step="any" value="8" required aria-describedby="hoursHelp validationError"><small id="hoursHelp">8 hours is an editable assumption, not a universal civil-service workday.</small></div>
+  </div>
+  <p id="validationError" class="error" role="alert" hidden></p>
+  <section aria-label="Calculation results" aria-live="polite" aria-atomic="true">
     <table>
-        <thead>
-            <tr>
-                <th>Accounting Metric Item</th>
-                <th class="text-right" style="width: 150px;">Value (HKD)</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Base Monthly Salary Level</td>
-                <td id="monthlySalaryDisplay" class="text-right">-</td>
-            </tr>
-            <tr>
-                <td><strong>Calculated Daily Pro-Rata Yield</strong></td>
-                <td id="dailyRate" class="text-right" style="font-weight: bold;">-</td>
-            </tr>
-            <tr>
-                <td>Hourly Equivalent Yield</td>
-                <td id="hourlyRate" class="text-right">-</td>
-            </tr>
-        </tbody>
+      <caption id="resultContext">Pay equivalents</caption>
+      <thead><tr><th scope="col">Measure</th><th scope="col" class="amount">HKD</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Monthly basic salary</th><td id="monthlySalaryDisplay" class="amount">—</td></tr>
+        <tr><th scope="row">Daily equivalent</th><td id="dailyRate" class="amount">—</td></tr>
+        <tr><th scope="row">Hourly equivalent</th><td id="hourlyRate" class="amount">—</td></tr>
+      </tbody>
     </table>
-
-    <p class="footer-note">
-        This calculator application functions entirely on local static computing parameters. 
-        It does not gather personal telemetry, load third-party scripts, or track analytical traffic. 
-        Licensed openly under the Creative Commons Attribution 4.0 framework.
-    </p>
-
-    <script>
-        // Audited and aligned with official HKSAR Civil Service Bureau Gazettes
-        const mpsDatabase = {
-            "2026": [
-                14570, 15485, 16460, 17545, 18675, 19930, 21190, 22590, 24060, 25620, // 0-9
-                27120, 28790, 30595, 32430, 34380, 36440, 38585, 41430, 43495, 45660, // 10-19
-                47950, 49230, 50215, 52690, 55640, 58755, 62050, 65495, 69125, 72915, // 20-29
-                76905, 81110, 85440, 89935, 94650, 99665, 104855, 110300, 116015, 122025, // 30-39
-                128360, 135005, 140970, 144335, 147790, 151325, 154950, 158670, 162485, 166380 // 40-49
-            ],
-            "2025": [
-                14280, 15180, 16135, 17200, 18305, 19535, 20770, 22145, 23585, 25115, // 0-9
-                26590, 28225, 29995, 31795, 33705, 35695, 37795, 40620, 42640, 44765, // 10-19
-                47010, 48265, 49230, 51655, 54550, 57605, 60835, 64210, 67770, 71485, // 20-29
-                75395, 79520, 83765, 88170, 92805, 97710, 102795, 108135, 113740, 119630, // 30-39
-                125845, 132355, 138205, 141505, 144890, 148355, 151910, 155560, 159295, 163120 // 40-49
-            ],
-            "2024": [
-                14280, 15180, 16135, 17200, 18305, 19535, 20770, 22145, 23585, 25115, // 0-9
-                26590, 28225, 29995, 31795, 33705, 35695, 37795, 40620, 42640, 44765, // 10-19
-                47010, 48265, 49230, 51655, 54550, 57605, 60835, 64210, 67770, 71485, // 20-29
-                75395, 79520, 83765, 88170, 92805, 97710, 102795, 108135, 113740, 119630, // 30-39
-                125845, 132355, 138205, 141505, 144890, 148355, 151910, 155560, 159295, 163120 // 40-49
-            ],
-            "2023": [
-                13865, 14740, 15665, 16700, 17770, 18965, 20165, 21500, 22895, 24380, // 0-9
-                25815, 27405, 29120, 30870, 32725, 34655, 36695, 39435, 41400, 43460, // 10-19
-                45640, 46860, 47795, 50150, 52960, 55925, 59065, 62340, 65795, 69405, // 20-29
-                73200, 77205, 81325, 85600, 90100, 94865, 99795, 104985, 110425, 116145, // 30-39
-                122180, 128500, 134180, 137385, 140670, 144035, 147485, 151030, 154655, 158370 // 40-49
-            ]
-        };
-
-        const yearSelect = document.getElementById('fiscalYear');
-        const monthSelect = document.getElementById('calendarMonth');
-        const mpsSelect = document.getElementById('mpsPoint');
-        const daysInput = document.getElementById('workingDays');
-        const hoursInput = document.getElementById('workingHours');
-        
-        const salaryDisplay = document.getElementById('monthlySalaryDisplay');
-        const dailyRateDisplay = document.getElementById('dailyRate');
-        const hourlyRateDisplay = document.getElementById('hourlyRate');
-
-        function populateMpsDropdown() {
-            const selectedYear = yearSelect.value;
-            const targetYearScale = mpsDatabase[selectedYear];
-            const activeIndex = mpsSelect.selectedIndex >= 0 ? mpsSelect.selectedIndex : 22;
-            
-            mpsSelect.innerHTML = '';
-            targetYearScale.forEach((salary, index) => {
-                const option = document.createElement('option');
-                option.value = salary;
-                option.textContent = `Point ${index} ($${salary.toLocaleString()})`;
-                mpsSelect.appendChild(option);
-            });
-
-            mpsSelect.selectedIndex = Math.min(activeIndex, targetYearScale.length - 1);
-            syncCalendarWeekdays();
-        }
-
-        function syncCalendarWeekdays() {
-            const fiscalYear = parseInt(yearSelect.value);
-            const month = parseInt(monthSelect.value);
-            const actualCalendarYear = (month <= 2) ? fiscalYear + 1 : fiscalYear;
-            
-            let weekdayCount = 0;
-            const daysInMonth = new Date(actualCalendarYear, month + 1, 0).getDate();
-            
-            for (let d = 1; d <= daysInMonth; d++) {
-                const dayOfWeek = new Date(actualCalendarYear, month, d).getDay();
-                if (dayOfWeek !== 0 && dayOfWeek !== 6) weekdayCount++;
-            }
-            daysInput.value = weekdayCount;
-            calculateRates();
-        }
-
-        function calculateRates() {
-            const monthlySalary = parseFloat(mpsSelect.value) || 0;
-            const days = parseFloat(daysInput.value) || 0;
-            const hours = parseFloat(hoursInput.value) || 0;
-
-            const daily = days > 0 ? (monthlySalary / days) : 0;
-            const hourly = hours > 0 ? (daily / hours) : 0;
-
-            salaryDisplay.textContent = `$${monthlySalary.toLocaleString()}`;
-            dailyRateDisplay.textContent = `$${daily.toFixed(2)}`;
-            hourlyRateDisplay.textContent = `$${hourly.toFixed(2)}`;
-        }
-
-        yearSelect.addEventListener('change', populateMpsDropdown);
-        monthSelect.addEventListener('change', syncCalendarWeekdays);
-        [mpsSelect, daysInput, hoursInput].forEach(element => {
-            element.addEventListener('input', calculateRates);
-        });
-
-        populateMpsDropdown();
-    </script>
+    <p id="formula" class="note"></p>
+  </section>
+  <p class="note">Daily and hourly figures are illustrative: monthly salary ÷ working days ÷ hours per day. They are <strong>not official payroll, part-month salary, overtime or statutory entitlement calculations</strong>. Allowances, deductions and tax are excluded. No intermediate rounding is used.</p>
+  <hr>
+  <details>
+    <summary>Official sources &amp; data notes</summary>
+    <p id="selectedSource" class="note"></p>
+    <ul class="note">
+      <li><a href="https://www.csb.gov.hk/english/admin/pay/42.html">CSB Master Pay Scale</a>: rates effective 1 April 2026 and the preceding rates.</li>
+      <li><a href="https://www.jsscs.gov.hk/reports/en/68/68.pdf">Standing Commission Report No. 68, Appendix E</a>: rates effective 1 April 2024.</li>
+      <li><a href="https://www.jsscs.gov.hk/reports/en/67/67.pdf">Standing Commission Report No. 67, Appendix E</a>: rates effective 1 April 2023.</li>
+      <li>2025/26 uses the unchanged 2024 rates, also shown in CSB’s column “as at 31.3.2026”.</li>
+      <li><a href="https://data.gov.hk/en-data/dataset/hk-csb-csb-pay-scales-cs-icac">Official CSB downloadable pay-scale dataset</a>.</li>
+    </ul>
+    <p class="note">Data checked: 25 September 2026. This version contains a fixed, locally bundled snapshot, not a live feed. A later year requires a verified data update. Figures in brackets are the alternative point labels used by CSB.</p>
+  </details>
+</main>
+<hr>
+<footer>
+  <p>Independent reference tool; not affiliated with the Hong Kong Government. Calculations run in your browser. This page includes no analytics, third-party scripts, external fonts or automatic data requests.</p>
+  <p>Licensed under Creative Commons Attribution 4.0, as stated in the supplied version.</p>
+</footer>
+<script id="calculator-core">
+"use strict";
+// Values transcribed from the linked official tables, not extrapolated from percentages.
+const SCALE_2023 = Object.freeze([
+  13860,14735,15665,16695,17770,18965,20165,21500,22895,24380,
+  25815,27405,29120,30870,32430,34060,35775,37585,39435,41400,
+  43460,45640,47795,50045,52410,54805,57390,60065,62895,65875,
+  68940,72180,75585,79135,79930,80730,82650,86575,90540,94735,
+  98810,103065,107515,112130,116165,123980,128420,133090,137875,142840
+]);
+const SCALE_2024 = Object.freeze([
+  14280,15180,16135,17200,18305,19535,20770,22145,23585,25115,
+  26590,28225,29995,31795,33405,35080,36850,38715,40620,42640,
+  44765,47010,49230,51545,53980,56450,59110,61865,64780,67850,
+  71010,74345,77855,81510,82330,83150,85130,89170,93255,97575,
+  101775,106155,110740,115495,119650,127700,132275,137085,142010,147125
+]);
+const SCALE_2026 = Object.freeze([
+  14570,15485,16460,17545,18675,19930,21190,22590,24060,25620,
+  27120,28790,30595,32430,34075,35780,37585,39490,41430,43495,
+  45660,47950,50215,52575,55060,57580,60290,63100,66075,69205,
+  72430,75830,79410,83140,83975,84815,86835,90955,95120,99525,
+  103810,108280,112955,117805,122045,130255,134920,139825,144850,150070
+]);
+const SCALES = Object.freeze({2023:SCALE_2023,2024:SCALE_2024,2025:SCALE_2024,2026:SCALE_2026});
+const ALIASES = Object.freeze({34:"33A",35:"33B",36:"33C",45:"44A",46:"44B"});
+const MONTHS = Object.freeze(["January","February","March","April","May","June","July","August","September","October","November","December"]);
+const YEARS = Object.freeze(Object.keys(SCALES).map(Number).sort((a,b)=>b-a));
+function calendarYear(financialYear, month) { return financialYear + (month < 3 ? 1 : 0); }
+function monthInfo(financialYear, month) {
+  if (!YEARS.includes(financialYear) || !Number.isInteger(month) || month < 0 || month > 11) throw new RangeError("Unsupported year or month");
+  const year = calendarYear(financialYear, month);
+  const days = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+  let weekdays = 0;
+  for (let d=1; d<=days; d++) {
+    const weekday = new Date(Date.UTC(year, month, d)).getUTCDay();
+    if (weekday !== 0 && weekday !== 6) weekdays++;
+  }
+  return {year, days, weekdays};
+}
+function defaultPeriod(now = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-GB", {timeZone:"Asia/Hong_Kong", year:"numeric", month:"numeric"}).formatToParts(now);
+  const year = Number(parts.find(p=>p.type === "year").value);
+  const month = Number(parts.find(p=>p.type === "month").value)-1;
+  const financialYear = year - (month < 3 ? 1 : 0);
+  const available = YEARS.includes(financialYear);
+  return {financialYear: available ? financialYear : YEARS[0], month, available};
+}
+function computeRates(financialYear, point, month, rawDays, rawHours) {
+  if (!YEARS.includes(financialYear) || !Number.isInteger(point) || point < 0 || point > 49) throw new RangeError("Unsupported year or point");
+  const info = monthInfo(financialYear, month);
+  const days = String(rawDays).trim() === "" ? NaN : Number(rawDays);
+  const hours = String(rawHours).trim() === "" ? NaN : Number(rawHours);
+  const dayError = !Number.isInteger(days) || days < 1 || days > info.days;
+  const hourError = !Number.isFinite(hours) || hours < 0.01 || hours > 24;
+  const salary = SCALES[financialYear][point];
+  return {salary, days, hours, dayError, hourError,
+    daily: dayError ? null : salary/days,
+    hourly: dayError || hourError ? null : salary/days/hours};
+}
+</script>
+<script id="calculator-ui">
+"use strict";
+const byId = id => document.getElementById(id);
+const yearSelect = byId("fiscalYear"), monthSelect = byId("calendarMonth"), pointSelect = byId("mpsPoint");
+const dayMode = byId("dayMode"), daysInput = byId("workingDays"), hoursInput = byId("workingHours");
+const integerFormat = new Intl.NumberFormat("en-HK", {maximumFractionDigits:0});
+const moneyFormat = new Intl.NumberFormat("en-HK", {minimumFractionDigits:2, maximumFractionDigits:2});
+function option(value, label) { const el=document.createElement("option"); el.value=String(value); el.textContent=label; return el; }
+function financialYearLabel(year) { return `${year}/${String(year+1).slice(-2)}`; }
+function updateMonths() {
+  const previous = monthSelect.value;
+  monthSelect.replaceChildren(...[3,4,5,6,7,8,9,10,11,0,1,2].map(month=>option(month, `${MONTHS[month]} ${calendarYear(Number(yearSelect.value),month)}`)));
+  monthSelect.value = previous === "" ? "3" : previous;
+}
+function updatePoints() {
+  const previous = pointSelect.value;
+  pointSelect.replaceChildren(...SCALES[yearSelect.value].map((salary,point)=>option(point,`Point ${point}${ALIASES[point] ? ` (${ALIASES[point]})` : ""} — HK$${integerFormat.format(salary)}`)));
+  pointSelect.value = previous === "" ? "11" : previous;
+}
+function updateDays() {
+  const info = monthInfo(Number(yearSelect.value), Number(monthSelect.value));
+  const automatic = dayMode.value === "weekdays";
+  daysInput.readOnly = automatic;
+  daysInput.max = String(info.days);
+  if (automatic) daysInput.value = String(info.weekdays);
+  byId("dayStatus").textContent = automatic ? `${info.weekdays} Monday–Friday dates; public holidays not deducted.` : `Custom value retained until changed. Enter 1–${info.days} whole days for this month.`;
+  render();
+}
+function render() {
+  const year=Number(yearSelect.value), point=Number(pointSelect.value), month=Number(monthSelect.value);
+  const rates=computeRates(year,point,month,daysInput.value,hoursInput.value);
+  const info=monthInfo(year,month);
+  const messages=[];
+  if(rates.dayError) messages.push(`Working days must be a whole number from 1 to ${info.days}.`);
+  if(rates.hourError) messages.push("Hours per day must be a number from 0.01 to 24.");
+  daysInput.setAttribute("aria-invalid",String(rates.dayError));
+  hoursInput.setAttribute("aria-invalid",String(rates.hourError));
+  byId("validationError").textContent=messages.join(" ");
+  byId("validationError").hidden=messages.length===0;
+  byId("monthlySalaryDisplay").textContent=integerFormat.format(rates.salary);
+  byId("dailyRate").textContent=rates.daily===null ? "—" : moneyFormat.format(rates.daily);
+  byId("hourlyRate").textContent=rates.hourly===null ? "—" : moneyFormat.format(rates.hourly);
+  byId("resultContext").textContent=`Point ${point} · ${MONTHS[month]} ${info.year}`;
+  byId("formula").textContent=messages.length ? "Correct the highlighted input to complete the calculation." : `HK$${integerFormat.format(rates.salary)} ÷ ${rates.days} days = HK$${moneyFormat.format(rates.daily)}/day; ÷ ${rates.hours} hours = HK$${moneyFormat.format(rates.hourly)}/hour.`;
+  byId("selectedSource").textContent=`Selected: ${financialYearLabel(year)}. Monthly scale effective from 1 April ${year===2025 ? 2024 : year}${year===2025 ? "; unchanged for 2025/26" : ""}.`;
+}
+const initial=defaultPeriod();
+yearSelect.replaceChildren(...YEARS.map(year=>option(year,`${financialYearLabel(year)}${year===2025 ? " (pay freeze)" : ""}`)));
+yearSelect.value=String(initial.financialYear);
+updateMonths(); monthSelect.value=String(initial.month); updatePoints(); updateDays();
+if(!initial.available) {
+  byId("archiveWarning").hidden=false;
+  byId("archiveWarning").textContent=`The current Hong Kong financial year is outside this archive. Showing ${financialYearLabel(YEARS[0])}, the latest bundled year—not a confirmation of current rates. Check CSB before use.`;
+}
+yearSelect.addEventListener("change",()=>{updateMonths();updatePoints();updateDays();});
+monthSelect.addEventListener("change",updateDays);
+dayMode.addEventListener("change",updateDays);
+pointSelect.addEventListener("change",render);
+daysInput.addEventListener("input",render);
+hoursInput.addEventListener("input",render);
+</script>
 </body>
 </html>
